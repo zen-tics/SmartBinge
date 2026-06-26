@@ -1,0 +1,46 @@
+{
+  "name": "SmartBinge",
+  "short_name": "SmartBinge",
+  "description": "Snap what you want, wait it out, then decide. SmartBinge's cooling-off timer cuts impulse buys by 30–40%. Fully offline — no accounts, no tracking, everything stays on your phone.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0047AB",
+  "theme_color": "#0047AB",
+  "categories": ["finance", "lifestyle", "productivity"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/shot1_list.png",
+      "sizes": "824x1830",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "My List — see what needs a decision, what's cooling off, and past choices"
+    },
+    {
+      "src": "screenshots/shot2_add.png",
+      "sizes": "824x1830",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Add an item — take a photo, upload or paste a link"
+    },
+    {
+      "src": "screenshots/shot3_inbox.png",
+      "sizes": "824x1830",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Review inbox — decide on items once the cooling-off period ends"
+    },
+    {
+      "src": "screenshots/shot4_trends.png",
+      "sizes": "824x1830",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Trends — see your buy, drop and defer patterns over time"
+    }
+  ]
+}

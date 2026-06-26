@@ -1,0 +1,199 @@
+BUY LATER — Installation & Usage Guide
+======================================
+
+Buy Later is a cooling-off app: photograph something you want, let it sit,
+then decide. Under $50 → review after 7 days. $50 and over → wait 14 days.
+
+It is built as an installable web app (PWA). On Android it installs to your
+home screen and runs full-screen like any other app, fully offline.
+
+------------------------------------------------------------
+PRIVACY & SECURITY (what "no data leaves the device" means)
+------------------------------------------------------------
+• The app makes ZERO network requests. There is no fetch/XHR call to any
+  server anywhere in the code. Your items, photos, prices and notes are
+  stored only in your phone's local browser database (IndexedDB).
+• The bundled service worker actively BLOCKS any cross-origin request, so
+  even a future mistake can't leak data off-device.
+• No accounts, no sign-in, no analytics, no ads, no third-party scripts.
+• Photos are downscaled and kept on-device; the optional photo scan (OCR)
+  runs locally — the text recognition never uploads your image.
+• "Export backup" writes a plain JSON file YOU control. Nothing is sent.
+
+You can verify all of the above: every file is plain text you can open and
+read. Search the code for "http" — you'll find none pointing outward.
+
+------------------------------------------------------------
+WHAT'S IN THE FOLDER
+------------------------------------------------------------
+  index.html        the app
+  app.js            all logic (storage, reviews, charts, reminders)
+  sw.js             service worker (offline + blocks outbound requests)
+  manifest.json     makes it installable
+  tesseract.min.js  on-device OCR shim (see "Enable photo auto-scan")
+  icon-192.png      app icons
+  icon-512.png
+  INSTALL.txt       this file
+
+------------------------------------------------------------
+INSTALL ON ANDROID — EASIEST METHOD (recommended)
+------------------------------------------------------------
+A PWA must be served over a local web address to install. Pick ONE:
+
+OPTION 1 — Host the folder (simplest, one-time)
+  1. Put the whole "buylater" folder on any static host you trust, e.g.
+     GitHub Pages, Netlify Drop (netlify.com/drop), or Cloudflare Pages.
+     (These only HOST the files; the app still never sends them your data.)
+  2. On your Android phone, open the resulting https:// link in Chrome.
+  3. Tap the ⋮ menu (top-right) → "Add to Home screen" / "Install app".
+  4. Confirm. "Buy Later" now appears in your app drawer and works offline,
+     even in airplane mode, from then on.
+
+OPTION 2 — Run a tiny local server from the phone (fully offline install)
+  1. Copy the "buylater" folder to your phone's storage.
+  2. Install a local-server app such as "Simple HTTP Server" or "Termux".
+     - Termux: run  `pkg install python`  then in the folder
+       `python -m http.server 8080`
+  3. In Chrome go to  http://localhost:8080  → ⋮ → "Add to Home screen".
+  After install it runs offline; you can stop the server.
+
+OPTION 3 — Just open it (no install, still works)
+  1. Copy the folder to the phone.
+  2. Open index.html in Chrome via a file manager.
+  Note: file:// mode disables the service worker, so it won't show the
+  "Install" prompt and reminders are limited — but you can still add and
+  review items. Use Option 1 or 2 for the real installed experience.
+
+------------------------------------------------------------
+ENABLE PHOTO AUTO-SCAN — step by step for GitHub Pages
+------------------------------------------------------------
+Out of the box the app asks you to type the name/price/store yourself.
+This section turns on automatic reading of those fields from the photo.
+You'll do this entirely in your web browser, on the github.com website —
+no command line, no installing anything on your computer.
+
+You are downloading 5 small files (the free, open-source OCR engine) and
+uploading them into your existing repo. These files are the *program*,
+not your data — your photos and items never get uploaded anywhere; the
+scanning still happens only on your phone, after this one-time setup.
+
+STEP 1 — Download the 5 files to your computer
+  Click each link below. Each one downloads a single file. Save them all
+  into one new folder on your computer (e.g. a folder called "tess-files"
+  on your Desktop) so they're easy to find in Step 3.
+
+  1. https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js
+  2. https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js
+  3. https://cdn.jsdelivr.net/npm/tesseract.js-core@5/tesseract-core-simd-lstm.wasm.js
+  4. https://cdn.jsdelivr.net/npm/tesseract.js-core@5/tesseract-core-simd-lstm.wasm
+  5. https://tessdata.projectnaptha.com/4.0.0/eng.traineddata.gz
+
+  Note for file 5: if your browser opens or renames it instead of saving
+  it as "eng.traineddata.gz", rename the downloaded file back to exactly
+  that name before continuing.
+
+STEP 2 — Replace the placeholder file at the root of your repo
+  1. Go to your repo on github.com (the one your GitHub Pages site is
+     built from) and make sure you're on the file list view.
+  2. Click into "tesseract.min.js" (the placeholder file already there).
+  3. Click the pencil/edit icon, delete everything, OR simpler: go back to
+     the file list, click "Add file" → "Upload files", then drag file #1
+     (tesseract.min.js) from Step 1 into the upload box.
+  4. GitHub will say a file with that name already exists and ask to
+     replace it — confirm. Scroll down and click "Commit changes".
+
+STEP 3 — Create a new folder called "tess" and upload the other 4 files
+  GitHub's web uploader will create a folder automatically if you type a
+  folder name in front of the file name in the upload box:
+  1. From the repo's main file list, click "Add file" → "Upload files".
+  2. Drag in files #2, #3, #4, and #5 from Step 1, all at the same time.
+  3. Above the file list in the upload box, there's a text field showing
+     where they'll be saved (it may just show blank/root). Click into that
+     path field and type:  tess/
+     This tells GitHub to put all 4 files inside a new "tess" folder.
+     (If you don't see a path field, instead create the folder first: click
+     "Add file" → "Create new file", type  tess/placeholder.txt  as the
+     file name, type any single character as content, and click "Commit
+     changes" — this creates the tess folder. Then open that folder and
+     use "Add file" → "Upload files" to drop the 4 files inside it. You can
+     delete placeholder.txt afterwards.)
+  4. Scroll down and click "Commit changes".
+
+STEP 4 — Check your repo structure
+  Your repo's file list should now look like this:
+    index.html
+    app.js
+    sw.js
+    manifest.json
+    tesseract.min.js        ← the real library now, not the placeholder
+    icon-192.png
+    icon-512.png
+    tess/
+      worker.min.js
+      tesseract-core-simd-lstm.wasm.js
+      tesseract-core-simd-lstm.wasm
+      eng.traineddata.gz
+
+STEP 5 — Wait for GitHub Pages to update, then test
+  1. Wait 1–2 minutes for GitHub Pages to rebuild (check the "Actions" tab
+     on your repo for a green checkmark if you want to confirm it's done).
+  2. On your phone, open your installed Buy Later app. If it was already
+     installed, close it fully and reopen it (or pull down to refresh) so
+     it picks up the update.
+  3. Tap + → take or upload a photo of a product. You should see "Reading
+     details on-device…" appear under the photo for a few seconds, then
+     the name/price/store fields fill in automatically. Edit anything it
+     got wrong before saving — it's a helper, not a final answer.
+
+If something doesn't auto-fill, that's fine — just type the fields in by
+hand. The rest of the app works identically either way.
+
+TROUBLESHOOTING
+  • Nothing happens / no "Reading details" text appears: double-check the
+    "tess" folder and file names match exactly what's listed in Step 4
+    (capitalization matters).
+  • It scans but never finishes: the file in tess/ may be incomplete —
+    redownload tesseract-core-simd-lstm.wasm (file #4) and re-upload it;
+    it's the largest file and most likely to get cut off on a slow
+    connection.
+  • Very old Android phones: if scanning fails silently, your device may
+    not support the "simd" build. This is uncommon on phones from the
+    last ~6 years; if it happens, the app still works fine without OCR.
+
+------------------------------------------------------------
+HOW TO USE
+------------------------------------------------------------
+ADD        Tap the + button. Choose Camera, Upload, or paste a product URL.
+           Confirm/edit the name, price, store and date, add an optional
+           note on WHY you want it, then "Save to Buy Later".
+
+WAIT       The item sits in your List with a countdown. Cheaper items get a
+           shorter wait, pricier ones longer (you set the rule in Settings).
+
+REVIEW     When the wait ends, the item appears in the Inbox tab (with a
+           badge). Open it and choose:
+             • Buy it   — you still want it; marks as bought.
+             • Defer    — unsure; resets the cooling-off and asks you again
+                          next cycle.
+             • Drop it  — the urge passed; marks as dropped (money saved).
+
+TRENDS     The Trends tab charts your buy / drop / defer pattern over the
+           last 6 months and shows how much impulse spending you've avoided.
+
+REMINDERS  Turn review reminders on/off in Settings. When on (and installed),
+           the app notifies you when items are due. Toggle off anytime.
+
+THEME      Light or dark, switchable in Settings.
+
+BACKUP     Settings → Export backup saves a JSON file. "Erase everything"
+           wipes all data from the device.
+
+------------------------------------------------------------
+NOTE ON "APK"
+------------------------------------------------------------
+This is delivered as an installable PWA rather than a raw .apk because a PWA
+is auditable plain-text (you can read every line and confirm there's no
+backdoor or hidden network call) and installs without needing to enable
+"unknown sources". If you specifically need a signed .apk, the same folder
+can be wrapped with a tool like Bubblewrap or PWABuilder — but that adds a
+build toolchain and a signing step, and the privacy behaviour is identical.
